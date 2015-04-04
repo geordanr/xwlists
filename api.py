@@ -576,6 +576,18 @@ class PlayersAPI(restful.Resource):
         if bail:
             return bail
 
+def delatinize(obj):
+    '''Convert latin-1 encoded stuff to utf-8'''
+    if isinstance(obj, str):
+        obj = obj.decode('latin-1')
+    elif isinstance(obj, list):
+        for o in obj:
+            delatinize(o)
+    elif isinstance(obj, dict):
+        for k, v in obj.iteritems():
+            obj[k] = delatinize(v)
+
+    return obj
 
 
 class TourneyToJsonConverter:
@@ -627,7 +639,7 @@ class TourneyToJsonConverter:
                 resref[PLAYER2_POINTS] = result.list2_score
                 resref[RESULT] = result.get_result_for_json()
 
-        return ret
+        return delatinize(ret)
 
 
 
